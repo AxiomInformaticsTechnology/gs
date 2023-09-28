@@ -1,0 +1,17 @@
+all: uno2p clean
+
+cpp: *.cpp
+	c++ -DMVAMPICH -std=c++14 -O3 -march=native -ffast-math -funroll-loops -Wall --compile -I/software/boost-1.75.0-el8-x86_64/include -I/software/mvapich-gdr-2.3.5-el8-x86_64/include -I/software/cuda-11.2-el8-x86_64/include *.cpp -lmpi
+
+cu: cpp
+	nvcc -DMVAMPICH -ccbin c++ -std=c++14 --use_fast_math --compile -I/software/boost-1.75.0-el8-x86_64/include -I/software/mvapich-gdr-2.3.5-el8-x86_64/include -I/software/cuda-11.2-el8-x86_64/include *.cu -maxrregcount=0 --machine 64 -cudart static -rdc=true -gencode=arch=compute_70,code=\"sm_70,compute_70\"
+
+link: cu
+	nvcc -DMVAMPICH -ccbin c++ -std=c++14 --use_fast_math -dlink -L/software/boost-1.75.0-el8-x86_64/lib -L/software/mvapich-gdr-2.3.5-el8-x86_64/lib -L/software/cuda-11.2-el8-x86_64/lib64 cuda_uno2p.o main.o master_cuda_uno2p.o master_uno2p.o printafx.o randafx.o sampler.o slave_cuda_uno2p.o slave_uno2p.o statsafx.o uno2p.o -lcudart -lcudadevrt -lcurand -gencode=arch=compute_70,code=sm_70 --machine 64
+
+uno2p: link
+	mkdir -p bin
+	mpic++ -DMVAMPICH -std=c++14 -O3 -Wall -L/software/mvapich-gdr-2.3.5-el8-x86_64/lib -L/software/cuda-11.2-el8-x86_64/lib64 *.o -o bin/uno2p -lcudart -lcudadevrt -lcurand -lcublas
+
+clean:
+	rm -rf *.o

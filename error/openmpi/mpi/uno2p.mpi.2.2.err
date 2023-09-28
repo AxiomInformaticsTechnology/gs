@@ -1,0 +1,12 @@
+slurmstepd: error: *** JOB 4055502 ON midway3-0277 CANCELLED AT 2022-05-28T21:04:12 DUE TO TIME LIMIT ***
+--------------------------------------------------------------------------
+ORTE has lost communication with a remote daemon.
+
+  HNP daemon   : [[42403,0],0] on node midway3-0277
+  Remote daemon: [[42403,0],1] on node midway3-0278
+
+This is usually due to either a failure of the TCP network
+connection to the node, or possibly an internal failure of
+the daemon itself. We cannot recover from this failure, and
+therefore will terminate the job.
+--------------------------------------------------------------------------
